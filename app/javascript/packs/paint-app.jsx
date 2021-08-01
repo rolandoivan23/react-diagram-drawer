@@ -54,7 +54,7 @@ class PaintCanvas extends React.Component{
   inResizePoint(cursorX, cursorY){
     for(let figura of this.figures){
   
-      if(cursorX == figura.width +figura.puntoInicialX ){
+      if(cursorX == figura.width + figura.puntoInicialX ){
         this.resizingSide = 'right';
         this.cursorElement.style.cursor = "col-resize";
         this.figureSelected = figura;
@@ -63,11 +63,11 @@ class PaintCanvas extends React.Component{
         this.resizingSide = 'left';
         this.cursorElement.style.cursor = "col-resize";
         return true;
-      }else if(cursorY == figura.height){
+      }else if(cursorY == figura.height + figura.puntoInicialY ){
         this.resizingSide = 'bottom';
         this.cursorElement.style.cursor = "ns-resize";
         return true;
-      }else if(cursorY == figura.puntoInicialY){
+      }else if(cursorY == figura.puntoInicialY ){
         this.resizingSide = 'top';
         this.cursorElement.style.cursor = "ns-resize";
         return true;
@@ -133,20 +133,20 @@ class PaintCanvas extends React.Component{
                           break;
             case 'left': this.figureSelected.paint(e.offsetX,
                                       this.figureSelected.puntoInicialY,
-                                      this.tmpWidth - e.offsetX, 
+                                      this.tmpWidth - (e.offsetX - this.tmpInicialX), 
                                       this.figureSelected.height);
                           break;
   
             case 'top':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
               e.offsetY,
               this.figureSelected.width, 
-              this.tmpHeight - e.offsetY );
+              this.tmpHeight - (e.offsetY - this.tmpInicialY ));
               break;
   
             case 'bottom':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
               this.figureSelected.puntoInicialY,
               this.figureSelected.width, 
-              e.offsetY);
+              e.offsetY - this.figureSelected.puntoInicialY);
                     break;
           }
         
@@ -188,6 +188,8 @@ class PaintCanvas extends React.Component{
         this.resizingFigure = true;
         this.tmpWidth = this.figureSelected.width;
         this.tmpHeight = this.figureSelected.height;
+        this.tmpInicialX = this.figureSelected.puntoInicialX;
+        this.tmpInicialY = this.figureSelected.puntoInicialY;
       }
     
     });
