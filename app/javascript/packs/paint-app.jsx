@@ -47,8 +47,10 @@ class PaintCanvas extends React.Component{
   }
 
   addFigures(figure){
-    if(figure instanceof Figura)
+    if(figure instanceof Figura){
       this.figures.push(figure);
+      figure.number = this.figures.length;
+    }
   }
 
   inResizePoint(cursorX, cursorY){
@@ -86,7 +88,7 @@ class PaintCanvas extends React.Component{
     this.cntx.lineWidth = 1;
     this.cursorElement = document.getElementsByTagName("body")[0]; 
     const figura = new Rectangulo(this.canvas);
-    this.figures.push(figura);
+    this.addFigures(figura);
     figura.paint(50,50,);
 
     ReactDOM.render(
@@ -95,7 +97,7 @@ class PaintCanvas extends React.Component{
     )
 
     ReactDOM.render(
-      <ResizingControls/>,
+      <ResizingControls canvasinstance={this}/>,
       document.querySelector('#resizing-controls-container')
     )
 
@@ -151,10 +153,6 @@ class PaintCanvas extends React.Component{
           }
         
         }
-
-
-
-
 
       }else{
         this.cntx.strokeStyle = "#111";
@@ -215,17 +213,17 @@ class PaintCanvas extends React.Component{
 	
   render(){
     return (
-      <div id="main-container">
-        <div id="figure-selector-container">
-
-        </div>
-        <div id="resizing-controls-container">
-
-        </div>
-        <div>
-          <canvas id="paint-canvas" width={this.props.width} height={this.props.height}></canvas>
-        </div>
-      </div>      
+      <div>
+        <div id="main-container">
+          <div id="figure-selector-container">
+  
+          </div>
+          <div id="resizing-controls-container">
+  
+          </div>
+        </div>      
+        <canvas id="paint-canvas" width={this.props.width} height={this.props.height}></canvas>
+      </div>
     ); 
     
   }
