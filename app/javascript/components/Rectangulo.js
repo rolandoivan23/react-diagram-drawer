@@ -23,7 +23,7 @@ class Rectangulo extends Figura  {
     this.setPuntoInicialY(y);
     this.width = width;
     this.height = height;
-    this.paint_area.fillText(`${this.width}X${this.height}`, x+5,y+10);
+    this.paint_area.fillText(`${this.number}. ${this.width}X${this.height}`, x+5,y+10);
   }
 
   setPuntoInicialX(x){

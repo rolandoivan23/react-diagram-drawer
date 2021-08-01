@@ -5,6 +5,7 @@ class Figura  {
   constructor(canvas){
     this.canvas = canvas;
     this.paint_area = canvas.getContext('2d');
+    this.number = -1;
   }
 
   paint(){
