@@ -25,9 +25,9 @@ class ResizingControls extends React.Component {
                value={this.state.noFigure}  
                onChange={ e => this.setState({noFigure: e.target.value})} 
         />
-        <input type="text" placeholder="X punto inicial" value={this.state.x} />
-        <input type="text" placeholder="Y punto inicial" value={this.state.y}/>
-        <input type="text" placeholder="width" value={this.state.w}/>
+        <input type="text" placeholder="X punto inicial" value={this.state.x}  onChange={ e => this.setState({x: e.target.value})} />
+        <input type="text" placeholder="Y punto inicial" value={this.state.y} onChange={ e => this.setState({y: e.target.value})} />
+        <input type="text" placeholder="width" value={this.state.w} onChange={ e => this.setState({w: e.target.value})} />
         <input type="text" placeholder="height" value={this.state.h} onChange={ e => this.setState({h: e.target.value})}/>
         <button onClick={ e => this.redimensionar(this.state.noFigure) }>OK</button>
       </React.Fragment>
