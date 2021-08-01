@@ -1,5 +1,7 @@
 import React from "react"
 import Rectangulo from "./Rectangulo";
+import Circulo from "./Circulo";
+
 class FigurePicker extends React.Component {
 
   constructor(props){
@@ -7,7 +9,8 @@ class FigurePicker extends React.Component {
     this.availableFigures = ['Rectangulo', 'Circle'];
     this.canvasComponent = props.canvasinstance;
     this.figuresClasses = {
-      'Rectangulo': Rectangulo
+      'Rectangulo': Rectangulo,
+      'Circle': Circulo
     }
   }
 

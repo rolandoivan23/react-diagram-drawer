@@ -35,7 +35,7 @@ class Figura  {
   }
 
   setPuntoInicialY(y){
-    this.setPuntoInicialY = y;
+    this.puntoInicialY = y;
   }
 }
 
