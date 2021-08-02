@@ -2,17 +2,19 @@ import React from "react"
 import Rectangulo from "./Rectangulo";
 import Circulo from "./Circulo";
 import Diamon from "./Diamon";
+import Triangle from "./Triangle";
 
 class FigurePicker extends React.Component {
 
   constructor(props){
     super(props)
-    this.availableFigures = ['Rectangulo', 'Circle', 'Diamon'];
+    this.availableFigures = ['Rectangulo', 'Circle', 'Diamon', 'Triangle'];
     this.canvasComponent = props.canvasinstance;
     this.figuresClasses = {
       'Rectangulo': Rectangulo,
       'Circle': Circulo,
-      'Diamon': Diamon
+      'Diamon': Diamon,
+      'Triangle': Triangle
     }
   }
 
