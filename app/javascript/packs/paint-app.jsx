@@ -203,12 +203,21 @@ class PaintCanvas extends React.Component{
           this.figureSelected.height);
           //console.log("ox: ", e.offsetX, " oy:", e.offsetY, " x:", this.figureSelected.puntoInicialX, " y:", this.figureSelected.puntoInicialY);
         this.movingFigure = false;
-      
+          
+        //With this avoid the cuted figures
+        this.paintAllFigures();
       }else if(this.resizingFigure){
         this.resizingFigure = false;
+        this.paintAllFigures();
       }
     });
 
+  }
+
+  paintAllFigures(){
+    this.cntx.clearRect(0,0,this.width, this.height);
+    for(let figure of this.figures)
+      figure.repaint();
   }
 	
   render(){
