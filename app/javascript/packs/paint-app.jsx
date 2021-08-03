@@ -46,6 +46,10 @@ class PaintCanvas extends React.Component{
     }
   }
 
+  setCursorType(type = 'default'){
+    this.cursorElement.style.cursor = type;
+  }
+
   inResizePoint(cursorX, cursorY){
     for(let figura of this.figures){
   
@@ -74,12 +78,13 @@ class PaintCanvas extends React.Component{
     return false;
     
   }
-
-
-
+  
+  
   //Handlers
 
   handlerMouseMove = (e) => {
+    //Mejora el rendimiento para no tener que revisar si esta el cursor dentro de una figura por 
+    //que el hecho de que se este moviendo nos idica que si esta el cursor en una figura
     if(!this.movingFigure){
       this.insiedFigure  = this.isCursorInsideAnyFigure(this.figures, 
                                                     e.offsetX, 
@@ -90,57 +95,21 @@ class PaintCanvas extends React.Component{
     if(!this.resizingFigure && (this.insiedFigure || this.movingFigure)){
       
       if(!this.movingFigure){
-        this.figureSelected.clear();
-        this.cursorElement.style.cursor = "move";
-        this.figureSelected.repaint("red");
+        this.setCursorType('move');
+        this.figureSelected.selectToMove();
       }else{
         this.cntx.strokeStyle  = 'red';
-        this.figureSelected.clear();
-        this.figureSelected.paint(e.offsetX,
-                  e.offsetY,
-                  this.figureSelected.width,
-                  this.figureSelected.height);
+        this.figureSelected.move(e.offsetX, e.offsetY);
         this.paintAllFigures();
       }
+    //Se esta redimensionando o el cursor esta en un punto del contorno de la figura.
     }else if(this.resizingFigure || this.inResizePoint(e.offsetX, e.offsetY)){
-
-      if(this.resizingFigure){
-        console.log(e.offsetX);
-        this.figureSelected.clear()
-        switch(this.resizingSide){
-          case 'right': this.figureSelected.paint(this.figureSelected.puntoInicialX,
-                                    this.figureSelected.puntoInicialY,
-                                    e.offsetX -  this.figureSelected.puntoInicialX, 
-                                    this.figureSelected.height);
-                        break;
-          case 'left': this.figureSelected.paint(e.offsetX,
-                                    this.figureSelected.puntoInicialY,
-                                    this.tmpWidth - (e.offsetX - this.tmpInicialX), 
-                                    this.figureSelected.height);
-                        break;
-
-          case 'top':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
-            e.offsetY,
-            this.figureSelected.width, 
-            this.tmpHeight - (e.offsetY - this.tmpInicialY ));
-            break;
-
-          case 'bottom':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
-            this.figureSelected.puntoInicialY,
-            this.figureSelected.width, 
-            e.offsetY - this.figureSelected.puntoInicialY);
-                  break;
-        }
-      
-      }
-
+      if(this.resizingFigure)
+        this.figureSelected.resize(e.offsetX, e.offsetY, this.resizingSide);
     }else{
-      this.cntx.strokeStyle = "#111";
-      this.cursorElement.style.cursor = "default";  
-
-      if(this.figureSelected){
+      this.setCursorType();  
+      if(this.figureSelected)
         this.figureSelected.repaint("#111");
-      }
     }
   }
 
@@ -149,66 +118,65 @@ class PaintCanvas extends React.Component{
       this.movingFigure = true;
     }else if(this.resizingSide){
       this.resizingFigure = true;
-      this.tmpWidth = this.figureSelected.width;
-      this.tmpHeight = this.figureSelected.height;
-      this.tmpInicialX = this.figureSelected.puntoInicialX;
-      this.tmpInicialY = this.figureSelected.puntoInicialY;
+      this.figureSelected.startResize();
     }
   }
 
   handlerMouseUp = (e) => { 
     if(this.movingFigure && !this.isCursorInsideAnyFigure(this.figures, e.offsetX, e.offsetY)){
-      this.cntx.strokeStyle = "#111";
-      this.figureSelected.clear();
-      this.figureSelected.paint(e.offsetX,
-                                e.offsetY,
-                                this.figureSelected.width,
-                                this.figureSelected.height);
+      this.figureSelected.repaint("#111");
       this.movingFigure = false;
       this.paintAllFigures();//With this avoid the cuted figures
     }else if(this.resizingFigure){
       this.resizingFigure = false;
+      this.figureSelected.endResize();
       this.paintAllFigures();//With this avoid the cuted figures
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  componentDidMount(){
+  setCanvas(){
     this.canvas = document.getElementById('paint-canvas');
     this.cntx = this.canvas.getContext("2d");
     this.cntx.lineWidth = 1;
+  }
+
+  setCursor(){
     this.cursorElement = document.getElementsByTagName("body")[0]; 
+  }
+
+  setDefaultFigure(){
     const figura = new Rectangulo(this.canvas);
     this.addFigures(figura);
     figura.paint(50,50,);
+  }
 
+  mountFiguresPicker(){
     ReactDOM.render(
       <FigurePicker canvasinstance={this}/>,
       document.querySelector('#figure-selector-container')
-    )
+    );
+  }
 
+  mountResizeControls(){
     ReactDOM.render(
       <ResizingControls canvasinstance={this}/>,
       document.querySelector('#resizing-controls-container')
-    )
+    );
+  }
 
-    this.canvas.addEventListener("mousemove", this.handlerMouseMove);//fin handler mouse move
+  //Fin handlers
 
+  componentDidMount(){
+    this.setCanvas();
+    this.setCursor();
+    this.setDefaultFigure();
+
+    this.mountFiguresPicker();
+    this.mountResizeControls();
+
+    this.canvas.addEventListener("mousemove", this.handlerMouseMove);
     this.canvas.addEventListener('mousedown', this.handlerMouseDown);
-
     this.canvas.addEventListener('mouseup', this.handlerMouseUp);
-
   }
 
   paintAllFigures(){

@@ -30,6 +30,61 @@ class Figura  {
     this.paint_area.strokeStyle = tmpColor;
   }
 
+  selectToMove(){
+    this.clear();
+    this.repaint("red");
+  }
+
+  move(x,y){
+    this.clear();
+    this.setPuntoInicialX(x);
+    this.setPuntoInicialY(y);
+  }
+
+  startResize(){
+    this.resizeState = {
+      x: this.puntoInicialX,
+      y: this.puntoInicialY,
+      width: this.width,
+      height: this.height
+    }
+  }
+
+  endResize(){
+    this.resizeState = null;
+  }
+
+  resize(x,y,side){
+    if(this.resizeState){
+      this.clear()
+      switch(side){
+        case 'right': this.paint(this.puntoInicialX,
+                                  this.puntoInicialY,
+                                  x -  this.puntoInicialX, 
+                                  this.height);
+                      break;
+        case 'left': this.paint(x,
+                                  this.puntoInicialY,
+                                  this.resizeState.width - (x - this.resizeState.x), 
+                                  this.height);
+                      break;
+  
+        case 'top':  this.paint(this.puntoInicialX,
+          y,
+          this.width, 
+          this.resizeState.height - (y - this.resizeState.y ));
+          break;
+  
+        case 'bottom':  this.paint(this.puntoInicialX,
+          this.puntoInicialY,
+          this.width, 
+          y - this.puntoInicialY);
+                break;
+      }
+    }
+
+  }
+
   setPuntoInicialX(x){
     this.puntoInicialX = x; 
   }
