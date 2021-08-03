@@ -30,6 +30,10 @@ class Figura  {
     this.paint_area.strokeStyle = tmpColor;
   }
 
+  rotate(){
+    
+  }
+
   selectToMove(){
     this.clear();
     this.repaint("red");

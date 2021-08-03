@@ -17,6 +17,20 @@ class PaintCanvas extends React.Component{
     this.movingFigure = false;
   }
 
+  componentDidMount(){
+    this.setCanvas();
+    this.setCursor();
+    this.setDefaultFigure();
+
+    this.mountFiguresPicker();
+    this.mountResizeControls();
+
+    this.canvas.addEventListener("mousemove", this.handlerMouseMove);
+    this.canvas.addEventListener('mousedown', this.handlerMouseDown);
+    this.canvas.addEventListener('mouseup', this.handlerMouseUp);
+    this.canvas.addEventListener('dblclick', this.handlerMouseDblClick);
+  }
+
   cursorInFigure(figura, cursorX, cursorY){
     if (cursorX > figura.puntoInicialX && cursorX < (figura.puntoInicialX + figura.width) &&
        (cursorY > figura.puntoInicialY && cursorY < (figura.puntoInicialY + figura.height))){
@@ -134,6 +148,11 @@ class PaintCanvas extends React.Component{
     }
   }
 
+  handlerMouseDblClick = e => {
+    this.movingFigure = false;
+    this.figureSelected.rotate();
+  }
+
   setCanvas(){
     this.canvas = document.getElementById('paint-canvas');
     this.cntx = this.canvas.getContext("2d");
@@ -166,18 +185,7 @@ class PaintCanvas extends React.Component{
 
   //Fin handlers
 
-  componentDidMount(){
-    this.setCanvas();
-    this.setCursor();
-    this.setDefaultFigure();
-
-    this.mountFiguresPicker();
-    this.mountResizeControls();
-
-    this.canvas.addEventListener("mousemove", this.handlerMouseMove);
-    this.canvas.addEventListener('mousedown', this.handlerMouseDown);
-    this.canvas.addEventListener('mouseup', this.handlerMouseUp);
-  }
+  
 
   paintAllFigures(){
     this.cntx.clearRect(0,0,this.width, this.height);
