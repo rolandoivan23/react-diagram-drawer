@@ -36,13 +36,6 @@ class PaintCanvas extends React.Component{
         return true;
       }
     }
-
-    // if(this.figureSelected){
-    //   this.cntx.strokeStyle = "#111";
-    //   this.figureSelected.clear();
-    //   this.figureSelected.repaint();
-    //   this.figureSelected = false;
-    // }
     return false;
   }
 
@@ -82,6 +75,115 @@ class PaintCanvas extends React.Component{
     
   }
 
+
+
+  //Handlers
+
+  handlerMouseMove = (e) => {
+    if(!this.movingFigure){
+      this.insiedFigure  = this.isCursorInsideAnyFigure(this.figures, 
+                                                    e.offsetX, 
+                                                    e.offsetY);
+    }
+
+    //NO se está redimensionando y el cursor esta dentro de una figura o ya se está moviendo una figura
+    if(!this.resizingFigure && (this.insiedFigure || this.movingFigure)){
+      
+      if(!this.movingFigure){
+        this.figureSelected.clear();
+        this.cursorElement.style.cursor = "move";
+        this.figureSelected.repaint("red");
+      }else{
+        this.cntx.strokeStyle  = 'red';
+        this.figureSelected.clear();
+        this.figureSelected.paint(e.offsetX,
+                  e.offsetY,
+                  this.figureSelected.width,
+                  this.figureSelected.height);
+        this.paintAllFigures();
+      }
+    }else if(this.resizingFigure || this.inResizePoint(e.offsetX, e.offsetY)){
+
+      if(this.resizingFigure){
+        console.log(e.offsetX);
+        this.figureSelected.clear()
+        switch(this.resizingSide){
+          case 'right': this.figureSelected.paint(this.figureSelected.puntoInicialX,
+                                    this.figureSelected.puntoInicialY,
+                                    e.offsetX -  this.figureSelected.puntoInicialX, 
+                                    this.figureSelected.height);
+                        break;
+          case 'left': this.figureSelected.paint(e.offsetX,
+                                    this.figureSelected.puntoInicialY,
+                                    this.tmpWidth - (e.offsetX - this.tmpInicialX), 
+                                    this.figureSelected.height);
+                        break;
+
+          case 'top':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
+            e.offsetY,
+            this.figureSelected.width, 
+            this.tmpHeight - (e.offsetY - this.tmpInicialY ));
+            break;
+
+          case 'bottom':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
+            this.figureSelected.puntoInicialY,
+            this.figureSelected.width, 
+            e.offsetY - this.figureSelected.puntoInicialY);
+                  break;
+        }
+      
+      }
+
+    }else{
+      this.cntx.strokeStyle = "#111";
+      this.cursorElement.style.cursor = "default";  
+
+      if(this.figureSelected){
+        this.figureSelected.repaint("#111");
+      }
+    }
+  }
+
+  handlerMouseDown = (e) => { 
+    if(this.insiedFigure){
+      this.movingFigure = true;
+    }else if(this.resizingSide){
+      this.resizingFigure = true;
+      this.tmpWidth = this.figureSelected.width;
+      this.tmpHeight = this.figureSelected.height;
+      this.tmpInicialX = this.figureSelected.puntoInicialX;
+      this.tmpInicialY = this.figureSelected.puntoInicialY;
+    }
+  }
+
+  handlerMouseUp = (e) => { 
+    if(this.movingFigure && !this.isCursorInsideAnyFigure(this.figures, e.offsetX, e.offsetY)){
+      this.cntx.strokeStyle = "#111";
+      this.figureSelected.clear();
+      this.figureSelected.paint(e.offsetX,
+                                e.offsetY,
+                                this.figureSelected.width,
+                                this.figureSelected.height);
+      this.movingFigure = false;
+      this.paintAllFigures();//With this avoid the cuted figures
+    }else if(this.resizingFigure){
+      this.resizingFigure = false;
+      this.paintAllFigures();//With this avoid the cuted figures
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
   componentDidMount(){
     this.canvas = document.getElementById('paint-canvas');
     this.cntx = this.canvas.getContext("2d");
@@ -101,116 +203,11 @@ class PaintCanvas extends React.Component{
       document.querySelector('#resizing-controls-container')
     )
 
-    this.canvas.addEventListener("mousemove", (e) => {
-      if(!this.movingFigure){
-        this.insiedFigure  = this.isCursorInsideAnyFigure(this.figures, 
-                                                      e.offsetX, 
-                                                      e.offsetY);
-      }
+    this.canvas.addEventListener("mousemove", this.handlerMouseMove);//fin handler mouse move
 
-      if(!this.resizingFigure && (this.insiedFigure || this.movingFigure)){
-        
-        if(!this.movingFigure){
-          this.figureSelected.clear();
-          this.cursorElement.style.cursor = "move";
-          this.figureSelected.repaint("red");
-        }else{
-          this.cntx.strokeStyle  = 'red';
-          this.figureSelected.clear();
-          this.figureSelected.paint(e.offsetX,
-                    e.offsetY,
-                    this.figureSelected.width,
-                    this.figureSelected.height);
-        }
-      }else if(this.resizingFigure || this.inResizePoint(e.offsetX, e.offsetY)){
+    this.canvas.addEventListener('mousedown', this.handlerMouseDown);
 
-        if(this.resizingFigure){
-          console.log(e.offsetX);
-          this.figureSelected.clear()
-          switch(this.resizingSide){
-            case 'right': this.figureSelected.paint(this.figureSelected.puntoInicialX,
-                                      this.figureSelected.puntoInicialY,
-                                      e.offsetX -  this.figureSelected.puntoInicialX, 
-                                      this.figureSelected.height);
-                          break;
-            case 'left': this.figureSelected.paint(e.offsetX,
-                                      this.figureSelected.puntoInicialY,
-                                      this.tmpWidth - (e.offsetX - this.tmpInicialX), 
-                                      this.figureSelected.height);
-                          break;
-  
-            case 'top':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
-              e.offsetY,
-              this.figureSelected.width, 
-              this.tmpHeight - (e.offsetY - this.tmpInicialY ));
-              break;
-  
-            case 'bottom':  this.figureSelected.paint(this.figureSelected.puntoInicialX,
-              this.figureSelected.puntoInicialY,
-              this.figureSelected.width, 
-              e.offsetY - this.figureSelected.puntoInicialY);
-                    break;
-          }
-        
-        }
-
-      }else{
-        this.cntx.strokeStyle = "#111";
-        this.cursorElement.style.cursor = "default";  
-
-        if(this.figureSelected){
-          this.figureSelected.repaint("#111");
-        }
-      }
-
-
-
-      //To repaint with original color
-
-     
-
-      
-      
-      // if(!this.insiedFigure && !this.resizingFigure && !this.movingFigure){
-      //   // if(  (!this.resizingFigure && e.offsetX == this.tmpWidth) || (this.resizingFigure && e.offsetX > this.tmpWidth) ){
-      //   this.inResizePoint();
-      // }
-      
-    });
-
-    this.canvas.addEventListener('mousedown', (e)=>{ 
-      if(this.insiedFigure){
-        this.movingFigure = true;
-        
-      }else if(this.resizingSide){
-        this.resizingFigure = true;
-        this.tmpWidth = this.figureSelected.width;
-        this.tmpHeight = this.figureSelected.height;
-        this.tmpInicialX = this.figureSelected.puntoInicialX;
-        this.tmpInicialY = this.figureSelected.puntoInicialY;
-      }
-    
-    });
-
-    this.canvas.addEventListener('mouseup', (e)=>{ 
-      if(this.movingFigure && !this.isCursorInsideAnyFigure(this.figures, e.offsetX, e.offsetY)){
-        
-        this.cntx.strokeStyle = "#111";
-        this.figureSelected.clear();
-        this.figureSelected.paint(e.offsetX,
-          e.offsetY,
-          this.figureSelected.width,
-          this.figureSelected.height);
-          //console.log("ox: ", e.offsetX, " oy:", e.offsetY, " x:", this.figureSelected.puntoInicialX, " y:", this.figureSelected.puntoInicialY);
-        this.movingFigure = false;
-          
-        //With this avoid the cuted figures
-        this.paintAllFigures();
-      }else if(this.resizingFigure){
-        this.resizingFigure = false;
-        this.paintAllFigures();
-      }
-    });
+    this.canvas.addEventListener('mouseup', this.handlerMouseUp);
 
   }
 
